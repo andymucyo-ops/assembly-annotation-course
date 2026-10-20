@@ -22,7 +22,7 @@ set -euo pipefail
 COURSEDIR='/data/courses/genome_annotation_resources/2026'
 WORKDIR='/data/users/ankunzimana/assembly-annotation-course'  # Directory in your /data/users/$USER/Folder.
 
-GENOME="$WORKDIR/assemblies/flye/assembly.fasta"  # Edit for your assembly.
+GENOME="$WORKDIR/data/assemblies/flye/assembly.fasta"  # Edit for your assembly.
 GENOME="$(readlink -f "$GENOME")"  # Bind the real assembly when using a symlink.
 # Arabidopsis coding sequences help remove gene-derived sequences from the TE library.
 CDS="$COURSEDIR/data/TAIR10_cds_20110103_representative_gene_model_updated"
