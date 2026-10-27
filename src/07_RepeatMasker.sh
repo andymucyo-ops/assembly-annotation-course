@@ -21,7 +21,7 @@ WORKDIR="/data/users/ankunzimana/assembly-annotation-course"
 COURSEDIR="/data/courses/genome_annotation_resources/2026"
 
 # derived paths
-ANNODIR="$WORKDIR/output/EDTE/${genome}.mod.EDTA.anno"
+ANNODIR="$WORKDIR/output/EDTA/${genome}.mod.EDTA.anno"
 OUTDIR="$WORKDIR/output/ParseRM"
 RM_OUT="$ANNODIR/${genome}.mod.EDTA.RM.out"
 RM_NONZERO="$OUTDIR/${genome}.mod.EDTA.RM.nonzero.out"

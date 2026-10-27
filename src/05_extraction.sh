@@ -30,4 +30,4 @@ apptainer exec -C --bind "$WORKDIR" "$COURSEDIR/containers/Annotation_analysis_R
 # Extract Gypsy sequences
 apptainer exec -C --bind "$WORKDIR" "$COURSEDIR/containers/Annotation_analysis_R4.4.sif" \
   seqkit grep -r -p "Gypsy" "$WORKDIR/output/EDTA/${genome}.mod.EDTA.TElib.fa" \
-  > ../Etraction/Gypsy_sequences.fa
+  > ../Extraction/Gypsy_sequences.fa
