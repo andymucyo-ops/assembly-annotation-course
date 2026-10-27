@@ -4,7 +4,7 @@ library(tidyverse)
 library(ComplexHeatmap)
 
 # Load the TE annotation GFF3 file
-gff_file <- "output/EDTA/assembly_flye.fasta.mod.EDTA.TEanno.gff3"
+gff_file <- "output/EDTA/assembly.fasta.mod.EDTA.TEanno.gff3"
 gff_data <- read.table(
   gff_file,
   header = FALSE,
