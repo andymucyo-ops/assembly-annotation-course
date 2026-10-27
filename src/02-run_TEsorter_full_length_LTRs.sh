@@ -33,10 +33,3 @@ apptainer exec -C --bind "$WORKDIR" --bind "$COURSEDIR" \
     --bind "$OUTDIR/tmp":/tmp --pwd "$OUTDIR" \
     "$COURSEDIR/containers/TEsorter_1.3.0.sif" \
     TEsorter intact_LTR.fa -db rexdb-plant -p "$SLURM_CPUS_PER_TASK"
-# After this job succeeds, run the R script in the output directory:
-cd "$OUTDIR"
-apptainer exec -C --bind "$WORKDIR" --bind "$COURSEDIR" --pwd "$OUTDIR" \
-  "$COURSEDIR/containers/Annotation_analysis_R4.4.sif" \
-  Rscript --vanilla "$COURSEDIR/scripts/03-full_length_LTRs_identity_copy.R"
-
-# You can also download the data and script and run it locally in RStudio. 
