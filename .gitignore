@@ -3,4 +3,9 @@ data/
 logs/
 output/
 
+#files
+*.gff3
+*.gff
+*.txt
+*.ctl
 
