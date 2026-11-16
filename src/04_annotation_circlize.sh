@@ -23,6 +23,6 @@ COURSEDIR="/data/courses/genome_annotation_resources/2026"
 apptainer exec -C --bind "$WORKDIR" "$COURSEDIR/containers/Annotation_analysis_R4.4.sif" samtools faidx "$WORKDIR/data/assemblies/flye/assembly.fasta"
 
 # execute the prepared R script
-apptainer exec -C --bind "$WORKDIR" --bind "$COURSEDIR"
+apptainer exec -C --bind "$WORKDIR" --bind "$COURSEDIR" \
 "$COURSEDIR/containers/Annotation_analysis_R4.4.sif" \
 Rscript --vanilla "$WORKDIR/src/04_annotation_circlize.R"

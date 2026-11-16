@@ -37,14 +37,3 @@ apptainer exec --cleanenv --pwd $FINALDIR \
     --goterms --iprlookup --seqtype p \
     -i ${protein}.renamed.fasta -o output.iprscan
 
-# Extreact remaining mRNA after filtering
-grep  -P "\tmRNA\t" filtered.genes.renamed.gff3 | awk '{print $9}' | cut -d ';' -f1 | \
-    sed 's/ID=//g' > list.txt
-
-ANALYSIS_SIF="$COURSEDIR/containers/Annotation_analysis_R4.4.sif"
-
-apptainer exec --cleanenv --bind $COURSEDIR --bind $WORKDIR --pwd $FINALDIR $ANALYSIS_SIF \
-    seqkit grep -f list.txt ${transcript}.renamed.fasta -o ${transcript}.renamed.filtered.fasta
-
-apptainer exec --cleanenv --bind $COURSEDIR --bind $WORKDIR --pwd $FINALDIR $ANALYSIS_SIF \
-    seqkit grep -f list.txt ${protein}.renamed.fasta -o ${protein}.renamed.filtered.fasta
