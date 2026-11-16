@@ -23,11 +23,11 @@ transcript="assembly.all.maker.transcripts.fasta"
 
 # Extreact remaining mRNA after filtering
 grep  -P "\tmRNA\t" filtered.genes.renamed.gff3 | awk '{print $9}' | cut -d ';' -f1 | \
-    sed 's/ID=//g' > list.txt
+    sed 's/ID=//g' > $WORKDIR/list.txt
 
 
 apptainer exec --cleanenv --bind $COURSEDIR --bind $WORKDIR --pwd $FINALDIR $ANALYSIS_SIF \
-    seqkit grep -f list.txt ${transcript}.renamed.fasta -o ${transcript}.renamed.filtered.fasta
+    seqkit grep -f $WORKDIR/list.txt ${transcript}.renamed.fasta -o ${transcript}.renamed.filtered.fasta
 
 apptainer exec --cleanenv --bind $COURSEDIR --bind $WORKDIR --pwd $FINALDIR $ANALYSIS_SIF \
-    seqkit grep -f list.txt ${protein}.renamed.fasta -o ${protein}.renamed.filtered.fasta
+    seqkit grep -f $WORKDIR/list.txt ${protein}.renamed.fasta -o ${protein}.renamed.filtered.fasta
