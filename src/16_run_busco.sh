@@ -12,7 +12,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --mail-user=andy.nkunzimana@students.unibe.ch
 
-set -euo pipefail
 WORKDIR="/data/users/ankunzimana/assembly-annotation-course"
 COURSEDIR="/data/courses/genome_annotation_resources/2026"
 AGAT_SIF="$COURSEDIR/containers/AGAT_v1.4.1.sif"
@@ -34,27 +33,17 @@ pick_longest () {
     $ANALYSIS seqkit grep -f "${out}.ids" "$in" -o "$out"
     echo "$out: $(grep -c '>' "$out") sequences (from $(grep -c '>' "$in"))"
 }
-# NOTE: pass fully qualified paths. The seqkit calls run inside the container
-# (cwd = $FINALDIR via --pwd) but the .ids redirect happens in the host shell
-# (cwd = $WORKDIR); with relative paths the .ids file landed in $WORKDIR and
-# seqkit grep then could not find it, so the longest FASTA was never created.
-pick_longest "$FINALDIR/${protein}.renamed.filtered.fasta" "$FINALDIR/${protein}.renamed.longest.fasta"
-pick_longest "$FINALDIR/${transcript}.renamed.filtered.fasta" "$FINALDIR/${transcript}.renamed.longest.fasta"
+pick_longest ${protein}.renamed.filtered.fasta ${protein}.renamed.longest.fasta
+pick_longest ${transcript}.renamed.filtered.fasta ${transcript}.renamed.longest.fasta
 
 cd "$FINALDIR"
 module load BUSCO/5.4.2-foss-2021a
 export PYTHONNOUSERSITE=1
-# Run BUSCO on the LONGEST protein and transcript sequences.
-# Skip runs whose completed summary already exists (avoids recompute and
-# "output directory exists" errors on re-runs).
-if [ ! -f "busco_proteins/short_summary.specific.brassicales_odb10.busco_proteins.txt" ]; then
-    busco -i "${protein}.renamed.longest.fasta" -l brassicales_odb10 -o busco_proteins \
-        -m proteins -c 4
-fi
-if [ ! -f "busco_transcripts/short_summary.specific.brassicales_odb10.busco_transcripts.txt" ]; then
-    busco -i "${transcript}.renamed.longest.fasta" -l brassicales_odb10 -o busco_transcripts \
-        -m transcriptome -c 4
-fi
+# Run BUSCO on the LONGEST protein and transcript sequences
+busco -i "${protein}.renamed.longest.fasta" -l brassicales_odb10 -o busco_proteins \
+    -m proteins -c 4
+busco -i "${transcript}.renamed.longest.fasta" -l brassicales_odb10 -o busco_transcripts \
+    -m transcriptome -c 4
 
 cd $WORKDIR
 #AGAT annotation statistics
