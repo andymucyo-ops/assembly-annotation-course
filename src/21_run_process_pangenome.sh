@@ -17,16 +17,7 @@ WORKDIR="/data/users/ankunzimana/assembly-annotation-course"
 COURSEDIR="/data/courses/genome_annotation_resources/2026"
 ANALYSIS_SIF="$COURSEDIR/containers/Annotation_analysis_R4.4.sif"
 TMPDIR="$WORKDIR/output/comparisons/Annotation_R_tmp"
-PANGENOME_R="$WORKDIR/src/process_pangenome.R"
-
-# Copy the course-provided process_pangenome.R once (it contains both the
-# presence-frequency analysis and the copy-number comparison).
-# EDIT the copied script before the first run:
-#   - wd           -> your GENESPACE directory ($WORKDIR/output/comparisons/GENESPACE)
-#   - focal_genome -> your accession name (same as $Accession in script 19)
-if [ ! -f "$PANGENOME_R" ]; then
-    cp "$COURSEDIR/scripts/"*process_pangenome*.R "$PANGENOME_R"
-fi
+PANGENOME_R="$WORKDIR/src/21_process_pangenome.R"
 
 mkdir -p "$TMPDIR"
 apptainer exec --cleanenv \
