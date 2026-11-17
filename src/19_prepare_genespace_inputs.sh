@@ -42,9 +42,27 @@ awk 'BEGIN{OFS="\t"} {split($9,a,";"); split(a[1],b,"="); print $1, $4-1, $5, b[
 # protein per gene before running BUSCO: ${protein}.renamed.longest.fasta.
 # Match FASTA IDs to BED gene IDs by removing MAKER transcript suffixes such as -RA.
 LONGEST_PROTEINS="$FINALDIR/assembly.all.maker.proteins.fasta.renamed.longest.fasta"
+
+# The longest-isoform FASTA is produced by 16_run_busco.sh (pick_longest).
+# GENESPACE needs a real protein FASTA, so fail early with a clear message if
+# it is missing, empty, or not a FASTA (line 1 must start with '>').
+if [ ! -s "$LONGEST_PROTEINS" ] || ! head -n 1 "$LONGEST_PROTEINS" | grep -q '^>'; then
+    echo "Longest-protein FASTA missing, empty, or not a FASTA: $LONGEST_PROTEINS" >&2
+    echo "Run src/16_run_busco.sh first (its pick_longest step creates it)." >&2
+    exit 1
+fi
+
 # Remove transcript suffixes and descriptions from FASTA headers.
-sed '/^>/s/ .*//' "$LONGEST_PROTEINS" | sed '/^>/s/-R[A-Z]*$//' \
+# (tr -d '\r' runs first so the $ anchors in the seds see clean line ends.)
+tr -d '\r' < "$LONGEST_PROTEINS" | sed '/^>/s/ .*//' | sed '/^>/s/-R[A-Z]*$//' \
     > "$GENESPACE_DIR/peptide/${Accession}.fa"
+
+# Guard against an empty or headerless output (GENESPACE needs '>' on line 1).
+if [ ! -s "$GENESPACE_DIR/peptide/${Accession}.fa" ] || \
+   ! head -n 1 "$GENESPACE_DIR/peptide/${Accession}.fa" | grep -q '^>'; then
+    echo "Peptide FASTA empty or missing '>' header: $GENESPACE_DIR/peptide/${Accession}.fa" >&2
+    exit 1
+fi
 
 # Add TAIR10. The supplied TAIR10 FASTA already uses gene IDs and contains one
 # protein per gene.
@@ -63,9 +81,17 @@ done
 # Validate matching IDs: each accession should report no duplicate IDs, no
 # differences between BED and FASTA IDs, no missing IDs, and no extra IDs.
 for acc in "$Accession" TAIR10 "$other1" "$other2" "$other3"; do
+    # The peptide file must be a real FASTA with at least one '>' record,
+    # otherwise a bare ID list would pass the ID comparison below unnoticed.
+    n_hdr=$(grep -c '^>' "$GENESPACE_DIR/peptide/${acc}.fa" || true)
+    if [ "${n_hdr}" -eq 0 ]; then
+        echo "${acc}: peptide file has no FASTA records (not a valid protein FASTA)" >&2
+        exit 1
+    fi
     awk '{print $4}' "$GENESPACE_DIR/bed/${acc}.bed" | sort > "$GENESPACE_DIR/tmp/${acc}.bed.ids"
     sed '/^>/s/-R[A-Z]*$//; s/^>//' "$GENESPACE_DIR/peptide/${acc}.fa" | sort > "$GENESPACE_DIR/tmp/${acc}.fa.ids"
     echo "== ${acc} =="
+    echo "FASTA records:          ${n_hdr}"
     echo "duplicate BED IDs:      $(uniq -d "$GENESPACE_DIR/tmp/${acc}.bed.ids" | wc -l | tr -d ' ')"
     echo "duplicate FASTA IDs:    $(uniq -d "$GENESPACE_DIR/tmp/${acc}.fa.ids" | wc -l | tr -d ' ')"
     echo "in BED not in FASTA:    $(comm -23 "$GENESPACE_DIR/tmp/${acc}.bed.ids" "$GENESPACE_DIR/tmp/${acc}.fa.ids" | wc -l | tr -d ' ')"
